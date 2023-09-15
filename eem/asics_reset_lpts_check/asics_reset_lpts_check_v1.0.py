@@ -37,9 +37,10 @@ def output_cleanup(cmd_output):
     # The output structure is "command/nresult", need to remove everything before and including /n
     result = cmd_output.split("\n")
     for l in result:
-        m = pattern.findall(l.strip(),0,len(l))
+        cl = l.strip()
+        m = pattern.findall(cl,0,len(cl))
         if len(m) > 0:
-            return l.strip(), 0
+            return cl, 0
     return "", 4
 
 

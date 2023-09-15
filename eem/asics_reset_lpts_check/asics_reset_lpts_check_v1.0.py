@@ -30,23 +30,24 @@ lpts_cmd = "sh lpts pifib statistics hardware police location 0/RP0/CPU0 | inc L
 syslog = xrlog.getSysLogger("asics_reset_lpts_check_eem")
 helper = XrcliHelper(debug = True)
 separator = re.compile("\s+")
+pattern = re.compile("^LDP-UDP.*")
 
 
 def output_cleanup(cmd_output):
     # The output structure is "command/nresult", need to remove everything before and including /n
     result = cmd_output.split("\n")
-    if len(result) != 4 :
-        syslog.info('unexpected number of strings' + "% s" % len(result))
-        return "", 4
-    clean_line = result[2].strip()
+    for l in result:
+        m = pattern.findall(l.strip(),0,len(l))
+        if len(m) > 0:
+            return l.strip(), 0
+    return "", 4
 
-    return clean_line,0
 
 def get_drops_count(clean_line):
     fields = separator.split(clean_line,0)
     # LDP-UDP     np             542            1000           615          0           default
     if len(fields) != 7 :
-        syslog.info('unexpected number of fields' + "% s" % len(fields))
+        syslog.info('unexpected number of fields' + " %s " % len(fields))
         return 0,5
     
     return int(fields[5],10),0
